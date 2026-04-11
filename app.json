@@ -6,15 +6,17 @@
 
     "scheme": "ping",
     "platforms": ["ios", "android"],
+
     "web": {
       "bundler": "metro",
       "output": "static",
       "favicon": "./assets/favicon.png"
     },
+
     "plugins": ["expo-router"],
+
     "experiments": {
       "typedRoutes": true,
-
       "tsconfigPaths": true
     },
 
@@ -28,11 +30,15 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+
     "assetBundlePatterns": ["**/*"],
+
     "ios": {
       "supportsTablet": true
     },
+
     "android": {
+      "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
