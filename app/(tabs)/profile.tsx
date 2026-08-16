@@ -9,7 +9,7 @@ export default function Profile() {
   const [userData, setUserData] = useState<any>(null);
   const user = auth.currentUser;
 
-  // ✅ Fetch user data
+  
   useEffect(() => {
     if (!user) return;
 
@@ -31,12 +31,12 @@ export default function Profile() {
   return (
     <View className="flex-1 bg-[#020617] px-6 pt-12">
 
-      {/* HEADER */}
+      
       <Text className="text-white text-3xl font-bold mb-8">
         Profile
       </Text>
 
-      {/* PROFILE CARD */}
+      
       <View className="bg-[#0f172a] rounded-3xl p-6 items-center shadow-lg">
 
         {/* Avatar */}
@@ -46,22 +46,22 @@ export default function Profile() {
           </Text>
         </View>
 
-        {/* Username */}
+        
         <Text className="text-white text-2xl font-bold">
           {userData?.username || "Username"}
         </Text>
 
-        {/* Email */}
+        
         <Text className="text-gray-400 mt-2">
           {user?.email}
         </Text>
 
       </View>
 
-      {/* ACTIONS */}
+      
       <View className="mt-10">
 
-        {/* Logout Button */}
+      
         <TouchableOpacity
           onPress={handleLogout}
           className="bg-red-500 py-4 rounded-2xl items-center"
