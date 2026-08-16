@@ -36,7 +36,7 @@ export default function Users() {
     return uid1 > uid2 ? uid1 + "_" + uid2 : uid2 + "_" + uid1;
   };
 
-  // 🔥 FILTER USERS
+  
   const filteredUsers = users.filter((user) =>
     user.username?.toLowerCase().includes(search.toLowerCase())
   );
@@ -48,7 +48,7 @@ export default function Users() {
         Chats
       </Text>
 
-      {/* 🔍 SEARCH BAR */}
+      
       <TextInput
         value={search}
         onChangeText={setSearch}
