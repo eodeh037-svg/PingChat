@@ -1,116 +1,149 @@
-import { useState } from "react";
+import { Ionicons } from '@expo/vector-icons';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { router } from 'expo-router';
+import { useState } from 'react';
 import {
-  View,
-  TextInput,
-  Text,
-  TouchableOpacity,
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
-  Image,
   Platform,
-} from "react-native";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../lib/firebase";
-import { router } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { getAuthErrorMessage } from '@/lib/authErrors';
+import { auth } from '@/lib/firebase';
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [focusedField, setFocusedField] = useState<'email' | 'password' | null>(null);
 
   const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert("Error", "Please fill in all fields");
+    if (!email.trim() || !password) {
+      setError('Enter your email and password to continue.');
       return;
     }
 
     setLoading(true);
-
+    setError(null);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-
-      Alert.alert("Success", "Logged in successfully!");
-
-      setEmail("");
-      setPassword("");
-
+      await signInWithEmailAndPassword(auth, email.trim(), password);
       router.replace('/(tabs)/chatlist');
-    } catch (error: any) {
-      Alert.alert("Error", error.message);
+    } catch (cause) {
+      setError(getAuthErrorMessage(cause));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-     <KeyboardAvoidingView
-      className="flex-1"
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
-      <SafeAreaView className="flex-1 bg-[#020617] justify-center items-center px-5">
-        {/* Logo */}
-        <Image
-          source={{
-            uri: "https://cdn-icons-png.flaticon.com/512/2462/2462719.png",
-          }}
-           style={{ width: 90, height: 90, tintColor: "#22c55e" }}
-        />
+    <KeyboardAvoidingView
+      className="flex-1 bg-[#0b0a10]"
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <SafeAreaView className="flex-1" edges={['top', 'bottom']}>
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', padding: 24 }}
+          keyboardShouldPersistTaps="handled">
+          <TouchableOpacity
+            accessibilityRole="button"
+            className="mb-9 h-11 w-11 items-center justify-center rounded-full bg-[#1b1922]"
+            onPress={() => router.replace('/')}>
+            <Ionicons name="chevron-back" size={22} color="#d7d2e0" />
+          </TouchableOpacity>
 
-        <Text className="text-4xl font-extrabold text-white mt-3 mb-6">
-          Ping Chat
-        </Text>
-
-        {/* Card */}
-      <View className="bg-[#1e293b] w-full rounded-3xl p-6">
-          <Text className="text-2xl font-bold text-white mb-6 text-center">
-            Welcome Back
+          <View className="mb-7 h-14 w-14 items-center justify-center rounded-[20px] bg-[#2b2245]">
+            <Ionicons name="chatbubble-ellipses" size={28} color="#b5a3ff" />
+          </View>
+          <Text className="text-sm font-bold uppercase tracking-[3px] text-[#ad99fa]">
+            Welcome back
+          </Text>
+          <Text className="mt-2 text-[34px] font-bold tracking-[-0.8px] text-[#f4f1fa]">
+            Good to see you.
+          </Text>
+          <Text className="mt-2 text-base leading-6 text-[#9995a5]">
+            Sign in to catch up on your conversations.
           </Text>
 
-          <TextInput
-            placeholder="Email"
-            placeholderTextColor="#94a3b8"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            className="bg-[#334155] text-white px-4 py-3 rounded-xl mb-4"
-          />
+          <View className="mt-8 gap-5">
+            <View>
+              <Text className="mb-2 ml-1 text-[13px] font-semibold text-[#cbc6d5]">
+                Email address
+              </Text>
+              <TextInput
+                accessibilityLabel="Email address"
+                value={email}
+                onChangeText={setEmail}
+                placeholder="you@example.com"
+                placeholderTextColor="#777382"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoComplete="email"
+                textContentType="emailAddress"
+                autoCorrect={false}
+                onFocus={() => setFocusedField('email')}
+                onBlur={() => setFocusedField(null)}
+                selectionColor="#b5a3ff"
+                className={`h-14 rounded-2xl border bg-[#15141c] px-4 text-[15px] text-[#f4f1fa] ${focusedField === 'email' ? 'border-[#9b83f4]' : 'border-[#302d3b]'}`}
+              />
+            </View>
+            <View>
+              <Text className="mb-2 ml-1 text-[13px] font-semibold text-[#cbc6d5]">Password</Text>
+              <TextInput
+                accessibilityLabel="Password"
+                value={password}
+                onChangeText={setPassword}
+                placeholder="Your password"
+                placeholderTextColor="#777382"
+                secureTextEntry
+                autoComplete="current-password"
+                textContentType="password"
+                onFocus={() => setFocusedField('password')}
+                onBlur={() => setFocusedField(null)}
+                selectionColor="#b5a3ff"
+                className={`h-14 rounded-2xl border bg-[#15141c] px-4 text-[15px] text-[#f4f1fa] ${focusedField === 'password' ? 'border-[#9b83f4]' : 'border-[#302d3b]'}`}
+                onSubmitEditing={() => void handleLogin()}
+                returnKeyType="go"
+              />
+            </View>
+          </View>
 
-          <TextInput
-            placeholder="Password"
-            placeholderTextColor="#94a3b8"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            className="bg-[#334155] text-white px-4 py-3 rounded-xl mb-4"
-          />
+          {error ? (
+            <View
+              accessibilityRole="alert"
+              className="mt-5 rounded-xl border border-[#684b58] bg-[#2b1d27] px-4 py-3">
+              <Text className="text-sm leading-5 text-[#e2aebe]">{error}</Text>
+            </View>
+          ) : null}
 
           <TouchableOpacity
-            onPress={handleLogin}
+            accessibilityRole="button"
             disabled={loading}
-          className="bg-green-500 py-3 rounded-xl flex-row justify-center items-center"
-          >
+            className={`mt-7 h-14 flex-row items-center justify-center rounded-2xl ${loading ? 'bg-[#66558d]' : 'bg-[#9b83f4]'}`}
+            onPress={() => void handleLogin()}>
             {loading ? (
               <ActivityIndicator color="white" />
             ) : (
-              <Text className="text-white font-bold text-lg">
-                Login
-              </Text>
+              <>
+                <Text className="text-base font-bold text-white">Sign in</Text>
+                <Ionicons name="arrow-forward" size={18} color="white" style={{ marginLeft: 9 }} />
+              </>
             )}
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => router.push("/signup")}
-            className="mt-5"
-          >
-           <Text className="text-center text-gray-400">
-              Don’t have an account?{" "}
-               <Text className="text-green-400 font-semibold">Sign Up</Text>
+            accessibilityRole="button"
+            className="mt-6 self-center py-2"
+            onPress={() => router.push('/signup')}>
+            <Text className="text-sm text-[#9995a5]">
+              New to Ping? <Text className="font-semibold text-[#c2b2ff]">Create an account</Text>
             </Text>
           </TouchableOpacity>
-        </View>
+        </ScrollView>
       </SafeAreaView>
     </KeyboardAvoidingView>
   );

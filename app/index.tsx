@@ -1,35 +1,67 @@
-import { View, Text, Image, TouchableOpacity } from "react-native";
-import React from "react";
-import { router } from "expo-router";
+import { Ionicons } from '@expo/vector-icons';
+import { Redirect, router } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Text, TouchableOpacity, View } from 'react-native';
+import { StateView } from '@/components/StateView';
+import { useAuth } from '@/app/context/AuthContext';
 
-function Index() {
-  return (
-    <View className="flex-1 items-center justify-center bg-[#0f172a] px-6">
-      <Image
-        source={{ uri: "https://cdn-icons-png.flaticon.com/512/2462/2462719.png" }}
-        style={{ width: 90, height: 90, tintColor: "#22c55e" }}
+export default function Welcome() {
+  const { user, loading, error } = useAuth();
+
+  if (loading) {
+    return (
+      <StateView
+        icon="chatbubble-ellipses-outline"
+        title="Getting Ping ready"
+        description="Connecting to your account…"
+        loading
       />
+    );
+  }
 
-      <Text className="text-3xl font-bold text-white text-center mt-4">
-        Welcome to Ping
-      </Text>
+  if (error) {
+    return (
+      <StateView
+        icon="alert-circle-outline"
+        title="Could not restore your session"
+        description={error.message}
+      />
+    );
+  }
 
-      <Text className="text-gray-500 mt-4 text-center text-lg">
-        Chat with friends and stay connected anytime, anywhere. Ping makes
-        messaging fast, simple, and real-time — no delays, no hassle. Join the
-        conversation and experience messaging the way it should be.
-      </Text>
+  if (user) {
+    return <Redirect href="/(tabs)/chatlist" />;
+  }
 
-      <TouchableOpacity className="bg-black w-[65%] h-[5.8%] items-center justify-center mt-8 rounded-lg" onPress={()=> {console.log("pressed")
-router.push('/signup')
-
-      } }>
-        <Text className="text-white text-center">
-          Get started
+  return (
+    <SafeAreaView className="flex-1 bg-[#0b0a10] px-7">
+      <View className="flex-1 justify-center">
+        <View className="mb-9 h-20 w-20 items-center justify-center rounded-[28px] bg-[#2b2245]">
+          <Ionicons name="chatbubble-ellipses" size={38} color="#b5a3ff" />
+        </View>
+        <Text className="text-sm font-bold uppercase tracking-[4px] text-[#ad99fa]">Ping Chat</Text>
+        <Text className="mt-4 max-w-sm text-[40px] font-bold leading-[48px] tracking-[-1.2px] text-[#f5f2fb]">
+          The best conversations feel effortless.
         </Text>
-      </TouchableOpacity>
-    </View>
+        <Text className="mt-4 max-w-sm text-base leading-7 text-[#9995a5]">
+          A calmer place to catch up, share a thought, and stay close to your people.
+        </Text>
+      </View>
+
+      <View className="pb-7">
+        <TouchableOpacity
+          accessibilityRole="button"
+          className="h-14 items-center justify-center rounded-2xl bg-[#9b83f4]"
+          onPress={() => router.push('/signup')}>
+          <Text className="text-base font-bold text-white">Create your account</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          accessibilityRole="button"
+          className="mt-4 h-14 items-center justify-center rounded-2xl border border-[#302d3b]"
+          onPress={() => router.push('/login')}>
+          <Text className="text-base font-semibold text-[#d3cfde]">I already have an account</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 }
-
-export default Index;
